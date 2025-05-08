@@ -2,6 +2,10 @@
 
      git clone https://github.com/Kevin-R1/packages.git package/Kevin-R1
      make menuconfig
+
+- luci-app-nikki
+- 如果要编译这个插件lede源码舍弃老的防火墙选择lede的防火墙4
+     
 ## 编译命令
 - 首先装好 Linux 系统，推荐 Debian 或 Ubuntu LTS
 
