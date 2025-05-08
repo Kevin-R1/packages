@@ -6,6 +6,7 @@
 - 首先装好 Linux 系统，推荐 Debian 或 Ubuntu LTS
 
 - 安装编译依赖
+- 
      sudo apt update -y
   
      sudo apt full-upgrade -y
