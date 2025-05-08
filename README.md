@@ -6,8 +6,8 @@
 - 首先装好 Linux 系统，推荐 Debian 或 Ubuntu LTS
 
 - 安装编译依赖
-bash
 
+bash
      sudo apt update -y
      sudo apt full-upgrade -y
      sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
