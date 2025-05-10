@@ -10,6 +10,7 @@ local lan_gateway = uci:get("netwizard", "default", "lan_gateway")
 if lan_gateway ~= "" then
    lan_gateway = sys.exec("ipaddr=`uci -q get network.lan.ipaddr`;echo ${ipaddr%.*}")
 end
+
 local lan_ip = uci:get("network", "lan", "ipaddr")
 local landhcp =  uci:get("network", "lan", "lan_dhcp")
 if landhcp ~= "" then
@@ -137,7 +138,7 @@ e = s:taboption("wansetup", Flag, "ipv6",translate('Enable IPv6'))
 e.default = "0"
 
 lan_dhcp = s:taboption("wansetup", Flag, "lan_dhcp", translate("Disable DHCP Server"), translate("Selecting means that the DHCP server is not enabled. In a network, only one DHCP server is needed to allocate and manage client IPs. If it is a secondary route, it is recommended to turn off the primary routing DHCP server."))
-lan_dhcp.default = 0
+lan_dhcp.default = landhcp
 lan_dhcp.anonymous = false
 
 e = s:taboption("wansetup", Flag, "dnsset", translate("Enable DNS notifications (ipv4/ipv6)"),translate("Forcefully specify the DNS server for this router"))
@@ -170,17 +171,11 @@ synflood = s:taboption("othersetup", Flag, "synflood", translate("Enable SYN-flo
 synflood.default = 1
 synflood.anonymous = false
 
--- dns_redirect = s:taboption("othersetup", Flag, "dns_redirect", translate("DNS Redirect"),translate("Force all TCP/UDP DNS 53ports in IPV4/IPV6 to be forwarded from this route[Suggest opening]"))
--- dns_redirect.default = 1
--- dns_redirect.anonymous = false
+e = s:taboption("othersetup", Flag, "showhide",translate('Hide Wizard'), translate('Show or hide the setup wizard menu. After hiding, you can open the display wizard menu in [Advanced Settings] [Advanced] or use the 3rd function in the background to restore the wizard and default theme.'))
 
-e = s:taboption("othersetup", Flag, "https",translate('Accessing using HTTPS'), translate('Open the address in the background and use HTTPS for secure access'))
-
-
-
-e=t:option(Button, "restart", translate("Perform operation"))
-e.inputtitle=translate("Click to execute")
-e.template ='netwizard'
-
+m.apply_on_parse = true
+m.on_after_apply = function(self,map)
+	luci.sys.exec("/etc/init.d/netwizard start >/dev/null 2>&1")
+end
 
 return m
