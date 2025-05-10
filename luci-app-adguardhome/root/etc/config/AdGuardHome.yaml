@@ -1,39 +1,36 @@
 http:
-  address: 0.0.0.0:3000
+  pprof:
+    port: 6060
+    enabled: false
+  address: 0.0.0.0:8551
   session_ttl: 720h
 users:
-  - name: admin
-    password: $2y$10$vHRcARdPCieYG3RXWomV5evDYN.Nj/edtwEkQgQJZcK6z7qTLaIc6
+  - name: root
+    password: $2a$10$n/xuPRLW5DRy/vtlXkWnnOedMaVPnRdmvU/pyu1ZHdieWv8E8178m
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
 language: zh-cn
 theme: auto
-debug_pprof: false
 dns:
   bind_hosts:
     - 0.0.0.0
-  port: 1745
+  port: 8553
   anonymize_client_ip: false
-  protection_enabled: true
-  blocking_mode: default
-  blocking_ipv4: ""
-  blocking_ipv6: ""
-  blocked_response_ttl: 10
-  protection_disabled_until: null
-  parental_block_host: family-block.dns.adguard.com
-  safebrowsing_block_host: standard-block.dns.adguard.com
   ratelimit: 0
+  ratelimit_subnet_len_ipv4: 24
+  ratelimit_subnet_len_ipv6: 56
   ratelimit_whitelist: []
   refuse_any: false
   upstream_dns:
-    - 223.5.5.5
+    - https://dns.alidns.com/dns-query
+    - 180.184.1.1
   upstream_dns_file: ""
   bootstrap_dns:
     - 119.29.29.29
     - 223.5.5.5
-  all_servers: false
-  fastest_addr: false
+  fallback_dns: []
+  upstream_mode: parallel
   fastest_timeout: 1s
   allowed_clients: []
   disallowed_clients: []
@@ -44,31 +41,34 @@ dns:
   trusted_proxies:
     - 127.0.0.0/8
     - ::1/128
-  cache_size: 4194304
+  cache_size: 41943040
   cache_ttl_min: 0
   cache_ttl_max: 0
   cache_optimistic: true
   bogus_nxdomain: []
   aaaa_disabled: false
   enable_dnssec: false
-  edns_client_subnet: false
+  edns_client_subnet:
+    custom_ip: ""
+    enabled: false
+    use_custom: false
   max_goroutines: 300
+  handle_ddr: true
   ipset: []
-  filtering_enabled: true
-  filters_update_interval: 24
-  parental_enabled: false
-  safesearch_enabled: false
-  safebrowsing_enabled: false
-  safebrowsing_cache_size: 1048576
-  safesearch_cache_size: 1048576
-  parental_cache_size: 1048576
-  cache_time: 30
-  rewrites: []
-  blocked_services: []
+  ipset_file: ""
+  bootstrap_prefer_ipv6: false
   upstream_timeout: 10s
   private_networks: []
   use_private_ptr_resolvers: true
   local_ptr_upstreams: []
+  use_dns64: false
+  dns64_prefixes: []
+  serve_http3: false
+  use_http3_upstreams: false
+  serve_plain_dns: true
+  hostsfile_enabled: true
+  pending_requests:
+    enabled: true
 tls:
   enabled: false
   server_name: ""
@@ -83,14 +83,27 @@ tls:
   private_key: ""
   certificate_path: ""
   private_key_path: ""
+  strict_sni_check: false
+querylog:
+  dir_path: ""
+  ignored: []
+  interval: 168h
+  size_memory: 1000
+  enabled: true
+  file_enabled: true
+statistics:
+  dir_path: ""
+  ignored: []
+  interval: 168h
+  enabled: true
 filters:
   - enabled: true
     url: https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
     name: AdGuard DNS filter
     id: 1228750870
   - enabled: true
-    url: http://sub.adtchrome.com/adt-chinalist-easylist.txt
-    name: 广告终结者使用的拦截规则，基于ChinaList+EasyList修正维护
+    url: https://raw.githubusercontent.com/BlueSkyXN/AdGuardHomeRules/master/all.txt
+    name: 百万ADH广告拦截过滤规则
     id: 139789181
   - enabled: true
     url: https://easylist-downloads.adblockplus.org/easylist.txt
@@ -104,71 +117,79 @@ filters:
     url: https://anti-ad.net/adguard.txt
     name: anti-AD命中率最高列表
     id: 139789122
-  - enabled: false
-    url: https://raw.iqiq.io/banbendalao/ADgk/master/ADgk.txt
-    name: ADgk去广告easylistchina补充规则
+  - enabled: true
+    url: https://cdn.jsdelivr.net/gh/privacy-protection-tools/anti-AD@master/anti-ad-easylist.txt
+    name: 目前中文区命中率最高的广告过滤列表，实现了精确的广告屏蔽和隐私保护屏蔽广告域名、电视盒子广告、APP内置广告
     id: 139789131
-  - enabled: false
-    url: https://raw.iqiq.io/banbendalao/ADgk/master/kill-baidu-ad.txt
-    name: ADgk百度广告过滤
+  - enabled: true
+    url: https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/light.txt
+    name: 广告拦截
     id: 139789133
-  - enabled: false
+  - enabled: true
     url: https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=1&mimetype=plaintext
     name: Peter Lowe’s Ad and tracking server list​
     id: 139789152
-  - enabled: false
-    url: https://easylist.to/easylist/fanboy-social.txt
-    name: Fanboy's Social Blocking List
+  - enabled: true
+    url: https://raw.githubusercontent.com/vokins/yhosts/master/hosts
+    name: yhosts – 屏蔽国内网站广告-国内维护
     id: 139789153
-  - enabled: false
+  - enabled: true
     url: https://easylist.to/easylist/fanboy-annoyance.txt
     name: Fanboy's Annoyance List
     id: 139789154
-  - enabled: false
+  - enabled: true
     url: https://secure.fanboy.co.nz/fanboy-cookiemonster.txt
     name: EasyList Cookie List
     id: 139789155
-  - enabled: false
+  - enabled: true
     url: https://fanboy.co.nz/fanboy-antifacebook.txt
     name: Anti-Facebook List
     id: 139789161
-  - enabled: false
+  - enabled: true
     url: https://filters.adtidy.org/extension/ublock/filters/14.txt
     name: AdGuard Annoyances filter
     id: 139789162
-  - enabled: false
-    url: https://www.fanboy.co.nz/enhancedstats.txt
-    name: Fanboy's Enhanced Tracking List
+  - enabled: true
+    url: https://www.i-dont-care-about-cookies.eu/abp/
+    name: 屏蔽网站的 cookies 相关的警告
     id: 139789164
-  - enabled: false
+  - enabled: true
     url: https://filters.adtidy.org/extension/ublock/filters/3.txt
     name: AdGuard Tracking Protection filter
     id: 139789165
-  - enabled: false
-    url: https://easylist.to/easylist/easylist.txt
-    name: EasyList
+  - enabled: true
+    url: https://raw.githubusercontent.com/217heidai/adblockfilters/main/rules/adblockdns.txt
+    name: DNS 拦截
     id: 139789171
-  - enabled: false
+  - enabled: true
     url: https://filters.adtidy.org/extension/ublock/filters/11.txt
     name: AdGuard Mobile Ads filter
     id: 139789172
-  - enabled: false
+  - enabled: true
     url: https://filters.adtidy.org/extension/ublock/filters/2_without_easylist.txt
     name: AdGuard Base filter
     id: 139789173
-  - enabled: false
+  - enabled: true
     url: https://easylist-downloads.adblockplus.org/antiadblockfilters.txt
     name: Adblock Warning Removal List
     id: 139789174
-  - enabled: false
-    url: https://fanboy.co.nz/fanboy-problematic-sites.txt
-    name: Fanboy's problematic-sites
+  - enabled: true
+    url: https://cdn.jsdelivr.net/gh/cjx82630/cjxlist@master/cjx-annoyance.txt
+    name: CJX’s Annoyance List (去自推列表)
     id: 139789175
-  - enabled: false
+  - enabled: true
     url: https://adaway.org/hosts.txt
     name: Adaway HOST
     id: 139789187
-whitelist_filters: []
+whitelist_filters:
+  - enabled: true
+    url: https://raw.githubusercontent.com/8680/GOODBYEADS/master/data/rules/allow.txt
+    name: 白名单1
+    id: 1746862722
+  - enabled: true
+    url: https://raw.githubusercontent.com/BlueSkyXN/AdGuardHomeRules/master/ok.txt
+    name: 白名单2
+    id: 1746862723
 user_rules:
   - '@@||taobao.com^$important'
   - '@@||tmall.com^$important'
@@ -195,6 +216,7 @@ user_rules:
 dhcp:
   enabled: false
   interface_name: ""
+  local_domain_name: lan
   dhcpv4:
     gateway_ip: ""
     subnet_mask: ""
@@ -208,12 +230,58 @@ dhcp:
     lease_duration: 86400
     ra_slaac_only: false
     ra_allow_slaac: false
-clients: []
-log_compress: false
-log_localtime: false
-log_max_backups: 0
-log_max_size: 100
-log_max_age: 3
-log_file: ""
-verbose: false
-schema_version: 10
+filtering:
+  blocking_ipv4: ""
+  blocking_ipv6: ""
+  blocked_services:
+    schedule:
+      time_zone: UTC
+    ids: []
+  protection_disabled_until: null
+  safe_search:
+    enabled: false
+    bing: true
+    duckduckgo: true
+    ecosia: true
+    google: true
+    pixabay: true
+    yandex: true
+    youtube: true
+  blocking_mode: default
+  parental_block_host: family-block.dns.adguard.com
+  safebrowsing_block_host: standard-block.dns.adguard.com
+  rewrites: []
+  safe_fs_patterns:
+    - /tmp/AdGuardHome/data/userfilters/*
+  safebrowsing_cache_size: 1048576
+  safesearch_cache_size: 1048576
+  parental_cache_size: 1048576
+  cache_time: 30
+  filters_update_interval: 24
+  blocked_response_ttl: 10
+  filtering_enabled: true
+  parental_enabled: false
+  safebrowsing_enabled: false
+  protection_enabled: true
+clients:
+  runtime_sources:
+    whois: true
+    arp: true
+    rdns: false
+    dhcp: true
+    hosts: true
+  persistent: []
+log:
+  enabled: true
+  file: ""
+  max_backups: 0
+  max_size: 100
+  max_age: 3
+  compress: false
+  local_time: false
+  verbose: false
+os:
+  group: ""
+  user: ""
+  rlimit_nofile: 0
+schema_version: 29
